@@ -21,7 +21,7 @@ Product discovery concluded and was approved on **2026-11-07**, including the pr
 - [Shared vocabulary](../GLOSSARY.md) defines domain terminology.
 - [Domain decision records](adr/) explain consequential approved trade-offs.
 
-These are discovery records, not an approved PRD or technical architecture. Preserve the entire agreed MVP as the v1 target. An earlier milestone is an intermediate deliverable; moving an approved requirement out of v1 requires the project owner's approval.
+These are approved discovery records that inform the approved ScreenTime v1 PRD (PRD.md). Technical architecture has not yet been approved. Preserve the entire agreed MVP as the v1 target. An earlier milestone is an intermediate deliverable; moving an approved requirement out of v1 requires the project owner's approval.
 
 ## Established product decisions
 
@@ -90,6 +90,6 @@ Prioritize maintainability, testability, clear architecture, and practical learn
 
 ## Current project status
 
-Discovery is complete and its product decisions are approved. No PRD or technical architecture has been approved, and application implementation is not authorized yet.
+Discovery and the ScreenTime v1 PRD were approved on 2026-11-07. Technical architecture has not yet been approved, and application implementation has not begun. The unresolved policy gates in the PRD remain in force.
 
-The next planning step is an MVP PRD based on the approved decisions and milestone coverage, followed by technical planning and review. Obtain approval before changing established product context or making architectural decisions on the project owner's behalf.
+The next planning step is technical architecture based on the approved PRD, discovery decisions, and milestones. Obtain approval before changing established product requirements or making architectural decisions on the project owner's behalf.
