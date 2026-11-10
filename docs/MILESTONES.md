@@ -14,9 +14,9 @@ Application implementation is not authorized by this documentation update.
 
 ## M1. Private groups and participant access
 
-**Outcome:** People can sign in with Google, create/switch between private groups, share invitations, and receive access only after approval. Owners/admins can maintain participants without accounts and explicitly link approved accounts to existing participants. Owner/admin permissions and ordinary-member removal are enforceable.
+**Outcome:** People can use Google sign-in or email/password registration and login, create/switch between private groups, share invitations, and receive access only after approval. Owners/admins can maintain participants without accounts and explicitly link approved accounts to existing participants. Owner/admin permissions and ordinary-member removal are enforceable.
 
-**Verification:** Exercise two groups with different accounts and roles. Verify private data stays within the approved group, a forwarded link grants no immediate access, a participant without an account has no access, and linking does not duplicate a participant. Verify admin appointment/removal and membership approval/removal permissions.
+**Verification:** Exercise Google sign-in and email/password registration and login, with two groups, different accounts, and different roles. Verify private data stays within the approved group, a forwarded link grants no immediate access, a participant without an account has no access, and linking an account to an existing group participant does not duplicate that participant. Verify admin appointment/removal and membership approval/removal permissions. Resolve and verify applicable authentication policies under PRD R-007 before M1 acceptance; supporting both methods does not itself approve sign-in method linking.
 
 **Coverage:** D01–D04. Depends on planning approval.
 

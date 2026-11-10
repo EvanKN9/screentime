@@ -2,6 +2,8 @@
 
 Discovery concluded and was approved by the project owner on **2026-11-07**, including the final clarifications recorded below. This document preserves product decisions; it is not a PRD or an architecture specification.
 
+**Approved amendment, 2026-11-09:** D02 now requires Google sign-in plus email/password registration and login for v1. Its original Google-only decision is retained below as superseded history. See [ADR 0003](adr/0003-support-google-and-email-password-sign-in.md); unrelated discovery decisions are unchanged.
+
 Read [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) for orientation, [GLOSSARY.md](../GLOSSARY.md) for vocabulary, and [MILESTONES.md](MILESTONES.md) for delivery organization. The full agreed MVP is the **v1 target**. Milestones do not remove or defer any approved v1 requirement.
 
 ## D01. Product and delivery
@@ -14,12 +16,15 @@ Read [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) for orientation, [GLOSSARY.md](../
 
 ## D02. Accounts, participants, and account links
 
-- Google sign-in is the only v1 sign-in option. Separate passwords and password recovery are outside v1.
+- **Original decision, 2026-11-07; superseded on 2026-11-09:** Google sign-in is the only v1 sign-in option. Separate passwords and password recovery are outside v1.
+- **Approved replacement, 2026-11-09:** V1 supports both Google sign-in and email/password registration and login. Password-recovery availability and behavior remain unresolved rather than automatically included or excluded. See [ADR 0003](adr/0003-support-google-and-email-password-sign-in.md) and PRD R-007.
 - A participant can exist without an account. Owners/admins can add and manage such participants, including their inclusion in picker rotation and attendance records.
 - Only approved accounts can access a private group and act in the app themselves. A participant record alone grants no access.
 - An owner/admin explicitly confirms the link between a newly joining account and an existing participant. A matching display name does not establish that link automatically.
 - Linking preserves that participant's history, suggestions, and current rotation state; it does not create a duplicate participant or grant a new turn.
 - Terminology distinguishes the participant in group activity from the member with approved account access. See [ADR 0001](adr/0001-participation-without-accounts.md).
+
+Sign-in method linking associates multiple sign-in methods with one ScreenTime account; the account links above associate accounts with existing group participants. The amendment does not approve sign-in method linking or unlinking, matching-email behavior, password recovery, email verification, or security-related policies. These require the targeted approval described in [PRD R-007](PRD.md#authentication-policy-questions-r-007). Authentication email requirements remain separate from D15's deferral of movie-night and group-activity notifications.
 
 ## D03. Private groups and admission
 

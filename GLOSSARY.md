@@ -22,6 +22,9 @@ _Avoid_: Pending member, guest account
 **Account link**:
 The confirmed association between an account and an existing participant in a particular group.
 
+**Sign-in method linking**:
+The association of multiple sign-in methods with one ScreenTime account, distinct from an account link to a group participant.
+
 **Membership request**:
 A request for an account to receive access to a private group.
 

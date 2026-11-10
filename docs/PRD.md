@@ -1,7 +1,7 @@
 # ScreenTime v1 Product Requirements Document
 
 **Document role:** Authoritative location for v1 product requirements and acceptance criteria.
-**Review status:** Approved by the project owner on 2026-11-07 as the ScreenTime v1 product requirements baseline. The unresolved policy gates in section 11 remain in force.
+**Review status:** Approved by the project owner on 2026-11-07 as the ScreenTime v1 product requirements baseline, with the Google and email/password authentication scope amendment approved on 2026-11-09. The unresolved policy gates in section 11 remain in force.
 **Scope:** The complete agreed MVP is the v1 target. Intermediate milestones do not redefine or reduce that target.
 
 ## 1. Authority, sources, and approval boundaries
@@ -14,10 +14,13 @@ This PRD translates the following approved sources into requirements:
 - [Domain glossary](../GLOSSARY.md).
 - [ADR 0001: participation without accounts](adr/0001-participation-without-accounts.md).
 - [ADR 0002: reservations and completed turns](adr/0002-reserve-turns-until-completion.md).
+- [ADR 0003: Google and email/password sign-in](adr/0003-support-google-and-email-password-sign-in.md), recording the approved 2026-11-09 amendment to D02.
 
 The discovery decisions remain the provenance for product policy, the glossary defines terminology, and the ADRs explain consequential domain trade-offs. The coverage matrix in section 12 connects every decision area and milestone to this specification.
 
 No material contradiction was found between the sources. In particular, M4's manual coordination and M5's rotation automation are successive delivery stages; both belong to v1. Participant versus member, reservation versus picker credit, and proxy RSVP versus proxy watchlist permissions are intentional distinctions.
+
+The approved 2026-11-09 amendment supersedes D02's original Google-only sign-in requirement. V1 requires Google sign-in and email/password registration and login. It does not select authentication tooling or resolve the policies in R-007. An **account link** associates an account with an existing group participant; **sign-in method linking** associates multiple sign-in methods with one ScreenTime account. Defining the latter does not approve a linking workflow or change FR-006's participant-linking rules.
 
 Requirements have permanent identifiers. Future revisions must preserve existing identifiers rather than renumber or reuse them. Acceptance criteria are referenced as, for example, FR-001.AC1.
 
@@ -77,18 +80,19 @@ Development planning uses 10 hours per week and a flexible timeline. No release 
 | Personalized group recommendations | High-priority post-MVP; retain the compatibility requirement in QR-002. No recommendation algorithm or weighting is approved. |
 | Personal watchlists, personal viewing logs, and ratings | Post-MVP. V1 history concerns completed group movie nights. |
 | Letterboxd integration | Future possibility subject to feasibility; no v1 dependency or promised integration behavior. |
-| Automated reminders and email/push notifications | Post-MVP. Members check ScreenTime or share changes themselves, including pending membership requests. |
+| Automated reminders and email/push notifications about movie-night and group activity | Post-MVP. Members check ScreenTime or share changes themselves, including pending membership requests. Authentication email requirements depend on the separate unresolved policies in R-007. |
 | External calendar integration | Post-MVP. V1 scheduling operates inside ScreenTime. |
 | Native mobile applications | Post-MVP; v1 is a responsive website. |
 | Week/day calendar time grids and drag-and-drop scheduling | Post-MVP; v1 includes month and upcoming-events views plus event editing. |
 | Monthly and more complex recurrence patterns | Post-MVP; v1 supports a selected weekday every week or every few weeks. |
 | Ongoing spreadsheet synchronization and a general-purpose importer | Post-MVP; v1 includes the existing group's one-time migration. |
 | Double features or multiple movies per event | Outside v1; each event supports one movie. |
-| Separate passwords and password recovery | Outside v1; Google is the sole sign-in experience. |
 | Automatic draws triggered by event dates | Outside v1; an event editor explicitly starts a draw. |
 | A separate banning system | Outside v1; former members can request fresh admission. |
 
 Watchlists and interest votes do not become binding movie-selection rules. The full set of approved v1 requirements remains required even when an earlier milestone is usable.
+
+Email/password registration and login are required in v1 under FR-001. Password-recovery availability and behavior remain unresolved under R-007, rather than automatically included or excluded by the authentication scope amendment.
 
 ## 4. Permissions and business rules
 
@@ -142,13 +146,15 @@ Every FR below belongs to v1. Source references identify the corresponding appro
 
 **User story US-001:** As a group organizer, I want private access and an accurate roster even if some friends never sign in, so the planner can represent the actual group.
 
-#### FR-001 — Google sign-in
+#### FR-001 — Google sign-in and email/password registration and login
 
-**Source:** D02.
+**Source:** D02 as amended on 2026-11-09; ADR 0003.
 
 - AC1: A person can sign in through Google to use account-based features.
-- AC2: V1 offers no separate password registration or password-recovery workflow.
+- AC2: A person can register using an email address and password and log in using email and password to use account-based features.
 - AC3: Signing in alone does not grant access to another person's private group; admission follows FR-004–FR-005.
+
+Authentication policy questions remain subject to R-007 before the affected implementation. Neither this requirement nor FR-006 approves sign-in method linking or automatic matching of sign-in identities.
 
 #### FR-002 — Create and belong to multiple groups
 
@@ -609,7 +615,7 @@ No specific device dimensions, accessibility conformance target, latency, uptime
 
 ### UF-01 — Create a group or join an existing one
 
-1. A person signs in through Google.
+1. A person uses Google sign-in or email/password registration and login.
 2. They either create a private group and become its owner, or follow a shared invite link to request admission to an existing group.
 3. For admission, an owner/admin approves access and explicitly confirms any link to an existing participant.
 4. The member can use that group's authorized features. A participant without an account remains represented without receiving access.
@@ -707,7 +713,7 @@ The milestones preserve [MILESTONES.md](MILESTONES.md). They are testable increm
 
 | Milestone | Dependencies | Functional requirements | Completion evidence |
 | --- | --- | --- | --- |
-| M1 Private groups and participant access | Approved PRD and subsequent technical approach | FR-001–FR-008 | All listed criteria pass with two groups, multiple roles, an unapproved requester, a participant without an account, and an explicitly linked account; private information and permissions remain separated. |
+| M1 Private groups and participant access | Approved PRD and subsequent technical approach | FR-001–FR-008 | All listed criteria pass for Google sign-in and email/password registration and login, with two groups, multiple roles, an unapproved requester, a participant without an account, and an account explicitly linked to a group participant; private information and permissions remain separated. Applicable R-007 policies are approved and verified. |
 | M2 Movies and shared suggestions | M1 | FR-009–FR-013 | Catalog and manual entries, own/manager removal, interest limits, and the restricted proxy policy all pass in separate groups. |
 | M3 Flexible group calendars | M1–M2 | FR-014–FR-020 | Individual and recurring nights, both calendar views, multiple viewer zones, seasonal-clock behavior, single/future operations, and editing permissions pass; relevant R-004 policies are approved and verified. |
 | M4 Movie-night attendance and history | M1–M3 | FR-021–FR-028 | A manually coordinated event completes the RSVP/movie/attendance/history flow; credited and uncredited nights give the expected totals and watchlist result. Relevant completion-validation criteria in R-003 are approved and verified. Required behavior works before random draw automation is added. |
@@ -716,6 +722,8 @@ The milestones preserve [MILESTONES.md](MILESTONES.md). They are testable increm
 | M7 Existing-group migration and pilot | M1–M6 | FR-044–FR-051 | Owner-approved data reconcile without unexplained loss/duplication, original workbook remains unchanged, and the phone/desktop pilot checklist passes with the migrated group as the main record. |
 
 QR-001 applies throughout. QR-002 is a review gate during subsequent technical planning before the initial data model is approved. Relevant identity/matching policies in R-005 must be resolved before the affected requirement is signed off.
+
+R-007 applies to authentication behavior across milestones, including any applicable effects on account lifecycle in M6. Approve the relevant policies before implementing the affected behavior; existing R-001 and R-002 lifecycle gates remain in force.
 
 V1 completion requires:
 
@@ -753,9 +761,9 @@ Letterboxd integration remains a separate future possibility subject to feasibil
 
 No unresolved item below is permission to remove an approved v1 requirement. Where discovery establishes an outcome but not every interaction, this PRD records the established criteria and marks the remaining policy gate.
 
-### Approval timing for R-001 through R-005
+### Approval timing for R-001 through R-005 and R-007
 
-R-001 through R-005 are approval gates **before implementation of the behaviors they affect**. Resolve the relevant unresolved choices and obtain project-owner approval before that affected work begins. Already approved requirements are not reopened, and these gates do not block unrelated work that has its normal planning approvals.
+R-001 through R-005 and R-007 are approval gates **before implementation of the behaviors they affect**. Resolve the relevant unresolved choices and obtain project-owner approval before that affected work begins. Already approved requirements are not reopened, and these gates do not block unrelated work that has its normal planning approvals.
 
 Targeted policy reviews at the point of need are sufficient; another comprehensive discovery interview is not required now. References elsewhere to milestone acceptance or sign-off remain verification gates for the approved outcomes, not permission to postpone policy approval until after implementation. This refinement does not select answers to any open policy.
 
@@ -767,6 +775,16 @@ Targeted policy reviews at the point of need are sufficient; another comprehensi
 | R-004 Recurrence and local-time exceptions | Group-local recurrence, viewer-local display, single/future changes, past-event preservation. | Nonexistent/ambiguous local times, changing the scheduling time zone, and bulk future edits interacting with existing occurrence exceptions, RSVPs, picker assignments, and movie choices are not specified. | Approve unresolved user-visible policies before implementing the affected recurrence or local-time behavior, then verify the M3/integrated scenarios. Time-zone detection tooling and UI presentation remain implementation choices. |
 | R-005 Movie identity and shared-entry semantics | Catalog search plus manual fallback; one interest vote per participant per movie; owner-reviewed migration matches. | The metadata source is unselected. Ongoing manual-to-catalog matching, duplicate suggestions with multiple contributors, vote retraction, and merges affecting ownership/interest/history are not defined. | Select tooling only in later approved technical planning; obtain approval for unresolved product policies affecting attribution, permissions, or counts before implementing their affected behavior, then verify the M2/M7 cases. Keep catalog search and fallback in scope. |
 | R-006 Delivery and adoption risk | 10 hours per week, flexible timeline, full seven-milestone v1, participants without accounts, pilot using migrated records. | Calendar exceptions and participant/account continuity make this a substantial project. No estimates, fixed pilot duration, or number of nights have been agreed. | Estimate after technical planning, preserve scope unless the project owner approves a change, and evaluate progress using milestone evidence and FR-051 rather than an invented deadline. |
+| R-007 Authentication policies | Google sign-in and email/password registration and login are required in v1; sign-in does not bypass private-group membership approval. | Sign-in method linking, password recovery, verification, and security-related behavior remain unresolved; see the [authentication policy questions](#authentication-policy-questions-r-007). | Obtain project-owner approval for the relevant product behavior and technical/security design before affected implementation. Record approved outcomes as testable criteria and verify applicable policies before M1 acceptance and affected later milestone acceptance. |
+
+### Authentication policy questions (R-007)
+
+- **Sign-in method linking:** whether it is available, how methods may be linked or unlinked, required proof of control, matching-email conflicts, and duplicate-account handling. This is separate from FR-006's owner/admin-confirmed account link to a group participant.
+- **Password recovery:** availability, identity checks, recovery flow, and effects on existing sessions. The approved registration/login requirement does not settle recovery scope or behavior.
+- **Email ownership:** verification requirements and timing, and the handling of email changes.
+- **Security-related behavior:** password rules, failed-attempt responses, throttling or lockouts, session duration, logout, and sensitive-action reauthentication.
+
+No automatic sign-in method linking, username login, recovery mechanism, security thresholds, authentication provider, or schema is approved by this amendment. Authentication email requirements depend on the decisions above; they are separate from the existing deferral of movie-night and group-activity notifications. Authentication tooling and credential storage design still require technical planning and approval.
 
 The following can be refined during implementation within the approved outcomes: wording and form arrangement, sorting/presentation, responsive layout details, and how review evidence is presented. Specific validation limits, new permissions, retention rules, automatic identity matching, or changed business outcomes are not merely presentation details and must not be introduced as already approved.
 
@@ -779,7 +797,7 @@ This matrix records a section-by-section coverage review. A mapped provisional r
 | Source | Preserved requirements or constraint | PRD coverage |
 | --- | --- | --- |
 | D01 Product and delivery | Actual-group and portfolio purpose; responsive web; 10-hour budget/flexible timeline; current remote routine/future in-person use; full v1 and spreadsheet replacement. | Sections 2–3 and 9; FR-014–FR-015, FR-044, FR-047, FR-051; QR-001. |
-| D02 Accounts, participants, links | Google only; accountless participation; approved app access; explicit matching; continuity without duplicate identities or turns. | FR-001, FR-003, FR-005–FR-006, FR-008, FR-036, FR-046. |
+| D02 Accounts, participants, links | Google sign-in and email/password registration and login under the approved 2026-11-09 amendment; accountless participation; approved app access; explicit participant matching; continuity without duplicate identities or turns. | FR-001, FR-003, FR-005–FR-006, FR-008, FR-036, FR-046; R-007. |
 | D03 Private groups and admission | Creation/multiple groups; isolation; shared/forwarded invite approval; fresh rejoin; no separate ban system. | FR-002, FR-004–FR-005, FR-008, FR-040; section 3. |
 | D04 Management and ownership | Creator owner; ongoing roles; admin/member authority; participant management; owner departure, approved-account transfer, confirmed owner-only deletion. | FR-002–FR-003, FR-007, FR-039, FR-041–FR-042; permission matrix. |
 | D05 Flexible calendar | Arbitrary nights; weekly/multiweek recurrence; group/viewer zones; start/end/details; month/upcoming; single/future changes; deferred advanced functions. | FR-014–FR-020; section 3; R-004. |
@@ -794,7 +812,7 @@ This matrix records a section-by-section coverage review. A mapped provisional r
 | D14 Migration | All existing datasets; no universal signup; reviewed matching/corrections; partial-attendance marker; completed totals/future reservations; explicit current-round setup; one-time only; original unchanged. | FR-044–FR-051; FR-006; R-005. |
 | D15 Post-MVP and compatibility | High-priority recommendations and desired signals; future personal features; compatibility constraint; explicit other deferrals and manual communication. | Sections 3, 6, and 10; QR-002. |
 | D16 Approval boundaries | Discovery concluded; no approved architecture; superseded signup/fixed-schedule/selection-consumes-turn assumptions; explicit scope-change approval. | Sections 1, 4, 9, and 11; FR-003, FR-014, FR-032–FR-033. |
-| M1 Private groups/participant access | Complete M1 outcome and role/isolation/link verification. | FR-001–FR-008; US-001; UF-01; section 9. |
+| M1 Private groups/participant access | Complete M1 outcome, both approved sign-in methods, and role/isolation/participant-link verification. | FR-001–FR-008; US-001; UF-01; section 9; R-007. |
 | M2 Movies/shared suggestions | Complete M2 outcome including restricted proxy permission tests. | FR-009–FR-013; US-002; UF-02; section 9. |
 | M3 Flexible calendars | Complete M3 outcome including editor rights, zones, recurrence exceptions, and past preservation. | FR-014–FR-020; US-003; UF-03; section 9. |
 | M4 Attendance/history | Complete manual coordination, movie permissions, optional attendance/credit, totals, and cleanup. | FR-021–FR-028; US-004; UF-04; section 9. |
@@ -803,6 +821,7 @@ This matrix records a section-by-section coverage review. A mapped provisional r
 | M7 Migration/pilot | Complete reviewed migration, source preservation, reconciliation, later links, and phone/desktop actual-group pilot. | FR-044–FR-051; US-007; UF-07; section 9. |
 | ADR 0001 | Distinct participation/access and manager-confirmed continuity. | FR-003, FR-006, FR-008, FR-036, FR-046; BR-01–BR-02. |
 | ADR 0002 | Reservation/completion distinction, cancellation release, independent eligibility, and one active round. | FR-025, FR-027, FR-032–FR-035, FR-038, FR-049; BR-05–BR-07. |
+| ADR 0003 | Approved Google and email/password authentication scope; superseded discovery history; distinction between sign-in method linking and participant account links; unresolved authentication policies. | FR-001, FR-006; sections 1, 3, 7, 9, and 11; R-007. |
 | Glossary | Participant/member distinction; event editor; scheduling zone; RSVP/actual attendance; rotation/reservation/credit/total; shared watchlist/interest/history. | Used throughout sections 2–12 and the permission/business-rule tables. |
 
 **Coverage result:** All 16 discovery decision areas and all seven milestone outcomes are represented. No approved requirement is intentionally omitted or moved to post-MVP. The unresolved policy/feasibility items are explicitly listed in section 11 and are not reported as already settled.

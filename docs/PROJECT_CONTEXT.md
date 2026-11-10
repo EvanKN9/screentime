@@ -23,11 +23,15 @@ Product discovery concluded and was approved on **2026-11-07**, including the pr
 
 These are approved discovery records that inform the approved ScreenTime v1 PRD (PRD.md). Technical architecture has not yet been approved. Preserve the entire agreed MVP as the v1 target. An earlier milestone is an intermediate deliverable; moving an approved requirement out of v1 requires the project owner's approval.
 
+On **2026-11-09**, the project owner approved Google sign-in plus email/password registration and login for v1, superseding the original Google-only discovery requirement. See [ADR 0003](adr/0003-support-google-and-email-password-sign-in.md) and FR-001 in the PRD.
+
 ## Established product decisions
 
 ### Accounts, participants, and private groups
 
-Google sign-in is the sole v1 sign-in experience. A participant may exist without an account; an approved member has account access to a private group. Owners/admins manage participants without accounts and explicitly confirm account links when those people join.
+V1 supports both Google sign-in and email/password registration and login. A participant may exist without an account; an approved member has account access to a private group. Owners/admins manage participants without accounts and explicitly confirm account links when those people join.
+
+Sign-in method linking means associating multiple sign-in methods with one ScreenTime account. It is separate from an account link to an existing group participant. Linking availability and behavior, password-recovery availability and behavior, email verification, and security-related behavior remain subject to project-owner approval under PRD R-007; supporting both sign-in methods does not settle those policies.
 
 Any signed-in user can create a group and belong to multiple groups. Members can share invite links, but owners/admins approve access. Only the owner appoints/removes admins, transfers ownership, and deletes the group. Ownership can transfer only to an approved account holder.
 
@@ -63,7 +67,7 @@ Personalized group recommendations remain a high-priority follow-up. Desired sig
 
 Initial data-model planning must demonstrate that v1 participant/account relationships, movie identities, group history, attendance, suggestions, and interest records can accommodate later personalization. Personal watchlists, personal viewing logs, and ratings will supply additional signals after MVP. This is a compatibility constraint for technical review, not approval of a schema, recommendation architecture, or extra v1 features.
 
-Other approved deferrals include automated reminders and email/push notifications, external calendar integration, native mobile apps, advanced calendar views and drag-and-drop scheduling, ongoing spreadsheet synchronization, and a general-purpose importer. Letterboxd integration remains a future goal subject to feasibility.
+Other approved deferrals include automated reminders and email/push notifications about movie-night and group activity, external calendar integration, native mobile apps, advanced calendar views and drag-and-drop scheduling, ongoing spreadsheet synchronization, and a general-purpose importer. Letterboxd integration remains a future goal subject to feasibility. Any authentication email requirements depend on the unresolved verification and recovery policies in PRD R-007; they are separate from these product-notification deferrals.
 
 ## Proposed technical stack
 
@@ -74,7 +78,7 @@ Other approved deferrals include automated reminders and email/push notification
 - Version control: Git / GitHub
 - Development assistance: Codex and GitHub Copilot
 
-These remain preferred technologies, not finalized architectural decisions. Google-only sign-in settles the product experience; authentication tooling, metadata provider, hosting, schema, and other architecture still require technical planning and approval.
+These remain preferred technologies, not finalized architectural decisions. Google sign-in and email/password registration and login are approved product requirements; authentication tooling, credential storage design, security policies, metadata provider, hosting, schema, and other architecture still require technical planning and approval.
 
 ## Development philosophy and delivery
 
@@ -90,6 +94,6 @@ Prioritize maintainability, testability, clear architecture, and practical learn
 
 ## Current project status
 
-Discovery and the ScreenTime v1 PRD were approved on 2026-11-07. Technical architecture has not yet been approved, and application implementation has not begun. The unresolved policy gates in the PRD remain in force.
+Discovery and the ScreenTime v1 PRD were approved on 2026-11-07, with the authentication scope amendment approved on 2026-11-09. Technical architecture has not yet been approved, and application implementation has not begun. The unresolved policy gates in the PRD, including R-007 for authentication, remain in force.
 
 The next planning step is technical architecture based on the approved PRD, discovery decisions, and milestones. Obtain approval before changing established product requirements or making architectural decisions on the project owner's behalf.
