@@ -1,7 +1,7 @@
 # ScreenTime v1 Product Requirements Document
 
 **Document role:** Authoritative location for v1 product requirements and acceptance criteria.
-**Review status:** Approved by the project owner on 2026-11-07 as the ScreenTime v1 product requirements baseline, with the Google and email/password authentication scope amendment approved on 2026-11-09. The unresolved policy gates in section 11 remain in force.
+**Review status:** Approved by the project owner on 2026-11-07 as the ScreenTime v1 product requirements baseline, with authentication scope and limited sign-in method linking approved on 2026-11-09, and the password-recovery flow and session-invalidation decision approved on 2026-11-10. The remaining unresolved policy gates in section 11 remain in force.
 **Scope:** The complete agreed MVP is the v1 target. Intermediate milestones do not redefine or reduce that target.
 
 ## 1. Authority, sources, and approval boundaries
@@ -15,16 +15,19 @@ This PRD translates the following approved sources into requirements:
 - [ADR 0001: participation without accounts](adr/0001-participation-without-accounts.md).
 - [ADR 0002: reservations and completed turns](adr/0002-reserve-turns-until-completion.md).
 - [ADR 0003: Google and email/password sign-in](adr/0003-support-google-and-email-password-sign-in.md), recording the approved 2026-11-09 amendment to D02.
+- [ADR 0004: connect Google to an existing password account](adr/0004-link-google-to-existing-password-account.md), recording the limited sign-in method linking decision approved on 2026-11-09.
+- [ADR 0005: password recovery and application-session invalidation](adr/0005-password-recovery-and-session-invalidation.md), recording the recovery decision approved on 2026-11-10.
+- [ADR 0006: Supabase Auth and Supabase PostgreSQL](adr/0006-select-supabase-auth-and-postgresql.md), recording the platform selection approved on 2026-11-10 and its unresolved linking-policy conflict.
 
 The discovery decisions remain the provenance for product policy, the glossary defines terminology, and the ADRs explain consequential domain trade-offs. The coverage matrix in section 12 connects every decision area and milestone to this specification.
 
-No material contradiction was found between the sources. In particular, M4's manual coordination and M5's rotation automation are successive delivery stages; both belong to v1. Participant versus member, reservation versus picker credit, and proxy RSVP versus proxy watchlist permissions are intentional distinctions.
+M4's manual coordination and M5's rotation automation are successive delivery stages; both belong to v1. Participant versus member, reservation versus picker credit, and proxy RSVP versus proxy watchlist permissions are intentional distinctions. The selected Supabase platform has an unresolved compatibility conflict with the approved sign-in method linking policy; R-007 records that implementation gate without changing the product requirement.
 
-The approved 2026-11-09 amendment supersedes D02's original Google-only sign-in requirement. V1 requires Google sign-in and email/password registration and login. It does not select authentication tooling or resolve the policies in R-007. An **account link** associates an account with an existing group participant; **sign-in method linking** associates multiple sign-in methods with one ScreenTime account. Defining the latter does not approve a linking workflow or change FR-006's participant-linking rules.
+The approved 2026-11-09 amendment supersedes D02's original Google-only sign-in requirement. V1 requires Google sign-in and email/password registration and login. The separately approved sign-in method linking rule in ADR 0004 resolves only the matching-email, existing-password-account scenario in FR-001.AC4–AC7; ADR 0005 establishes the password-recovery flow and invalidation of all application sessions in FR-001.AC8–AC11. Supabase Auth and Supabase PostgreSQL are selected under ADR 0006; the linking conflict and other policies in R-007 remain unresolved. An **account link** associates an account with an existing group participant; **sign-in method linking** associates multiple sign-in methods with one ScreenTime account. Platform selection does not change either relationship or FR-006's participant-linking rules.
 
 Requirements have permanent identifiers. Future revisions must preserve existing identifiers rather than renumber or reuse them. Acceptance criteria are referenced as, for example, FR-001.AC1.
 
-Unspecified policy is recorded in section 11 rather than silently selected. Resolving those items may require approved additions to acceptance criteria. Project-owner approval is required for product scope or policy changes. This document does not select implementation frameworks, storage structures, authentication tooling, metadata providers, or hosting, and does not authorize application implementation or technical architecture work.
+Unspecified policy is recorded in section 11 rather than silently selected. Resolving those items may require approved additions to acceptance criteria. Project-owner approval is required for product scope or policy changes. The selected React/FastAPI/Supabase foundations are recorded in ADR 0006; their remaining configuration, application storage structures, metadata provider, and frontend/backend hosting still require the relevant planning and approval. This documentation update does not authorize application implementation.
 
 ## 2. Vision, users, and problems
 
@@ -71,7 +74,7 @@ The current group meets remotely on Thursdays at 8 PM Pacific local time, follow
 | G-05 Replace the spreadsheet in actual use | The migrated group uses ScreenTime as its main record and completes the pilot checklist in FR-051. |
 | G-06 Preserve the recommendation path | The compatibility review in QR-002 is completed during subsequent technical planning before the initial data model is approved. |
 
-Development planning uses 10 hours per week and a flexible timeline. No release date, implementation estimate, service-level target, or fixed number of pilot nights has been agreed.
+Development planning uses 10 hours per week, with an approved December 31, 2026 target for the intermediate checkpoint in section 9. The full v1 timeline remains flexible. No full-v1 release date, implementation estimate, service-level target, or fixed number of pilot nights has been agreed.
 
 ### Non-goals and post-MVP boundaries
 
@@ -92,7 +95,7 @@ Development planning uses 10 hours per week and a flexible timeline. No release 
 
 Watchlists and interest votes do not become binding movie-selection rules. The full set of approved v1 requirements remains required even when an earlier milestone is usable.
 
-Email/password registration and login are required in v1 under FR-001. Password-recovery availability and behavior remain unresolved under R-007, rather than automatically included or excluded by the authentication scope amendment.
+Email/password registration and login, and the approved password-recovery flow, are required in v1 under FR-001. Recovery uses a code sent to the account's previously verified email, permits choosing a new password, and ends all existing ScreenTime application sessions while preserving the confirmation screen. Remaining recovery and security details stay open under R-007.
 
 ## 4. Permissions and business rules
 
@@ -148,13 +151,21 @@ Every FR below belongs to v1. Source references identify the corresponding appro
 
 #### FR-001 — Google sign-in and email/password registration and login
 
-**Source:** D02 as amended on 2026-11-09; ADR 0003.
+**Source:** D02 as amended on 2026-11-09; ADR 0003; the limited sign-in method linking decision in ADR 0004, approved on 2026-11-09; the recovery decision in ADR 0005, approved on 2026-11-10.
 
 - AC1: A person can sign in through Google to use account-based features.
 - AC2: A person can register using an email address and password and log in using email and password to use account-based features.
 - AC3: Signing in alone does not grant access to another person's private group; admission follows FR-004–FR-005.
+- AC4: When Google sign-in uses the same email as an existing password account, matching emails alone do not connect Google to that account. Connecting Google requires successful Google authentication and successful authentication to the existing ScreenTime account.
+- AC5: After both authentication checks in AC4 succeed, Google is connected to the existing ScreenTime account rather than creating another account.
+- AC6: After that connection, either Google sign-in or email/password login signs into the same ScreenTime account, preserving its existing memberships and history; ordinary sign-in does not require both methods on every login.
+- AC7: If the person cannot authenticate to the existing ScreenTime account in AC4, that Google sign-in attempt stops without connecting Google or creating another account. The existing account remains unchanged.
+- AC8: A person with an email/password account can initiate password recovery through a Forgot password link. A recovery code is sent to the email address already verified on that account.
+- AC9: A valid recovery code authorizes the person to choose a new password; it does not retrieve the previous password or automatically sign the person into ScreenTime.
+- AC10: After a successful password reset, all existing ScreenTime application sessions are invalidated, including any session in the browser performing the reset. Previously signed-in devices must authenticate again before accessing protected application features.
+- AC11: The recovery flow remains on a confirmation screen after the reset, despite application-session invalidation, and offers normal sign-in. The person can then sign in using the new password; completing recovery does not automatically sign them in.
 
-Authentication policy questions remain subject to R-007 before the affected implementation. Neither this requirement nor FR-006 approves sign-in method linking or automatic matching of sign-in identities.
+AC4–AC7 approve only the matching-email, existing-password-account-to-Google scenario. AC8–AC11 approve recovery through the account's previously verified email, a new password, invalidation of every existing application session, and confirmation followed by normal sign-in. Remaining recovery security details, unlinking, Google-first accounts later adding passwords, different-email linking, pre-existing duplicate accounts, and other authentication policies remain subject to R-007 before affected implementation. Sensitive-action reauthentication remains a separate unresolved policy; AC6 does not determine it. FR-006 continues to govern account links to group participants.
 
 #### FR-002 — Create and belong to multiple groups
 
@@ -620,6 +631,8 @@ No specific device dimensions, accessibility conformance target, latency, uptime
 3. For admission, an owner/admin approves access and explicitly confirms any link to an existing participant.
 4. The member can use that group's authorized features. A participant without an account remains represented without receiving access.
 
+When Google sign-in encounters a matching-email password account, apply FR-001.AC4–AC7 before connecting the methods. This sign-in method linking is separate from the participant account link in step 3.
+
 **Requirements:** FR-001–FR-008.
 
 ### UF-02 — Collect suggestions and interest
@@ -687,6 +700,7 @@ These are required verification scenarios for the referenced behavior. Open poli
 | --- | --- |
 | A link is forwarded to someone outside the group | Fresh approval is still required; no private access from the link alone. FR-004–FR-005. |
 | Two people have the same display name | No automatic account link; a manager confirms the correct participant. FR-006. |
+| Google sign-in matches an existing password account's email | Matching email alone does not connect the methods. Authenticate both before connecting; afterward either method reaches the same account. If existing-account authentication fails, stop the attempt without a link or another account. FR-001.AC4–AC7. |
 | A later signup matches an imported participant | Preserve records, interest, and current turn; no duplicate person or bonus turn. FR-006, FR-036, FR-046. |
 | A picker has no account | An event editor records their choice; the picker gains no app access. FR-023–FR-024. |
 | A participant with an account asks a manager to enter a vote | Proxy watchlist capability is unavailable for that person, unlike proxy RSVPs. FR-013, FR-022. |
@@ -735,19 +749,23 @@ V1 completion requires:
 
 ### Early end-to-end demonstrable release checkpoint
 
-An early demonstrable release should show one complete journey using selected existing M1–M4 behaviors. It is a development checkpoint, not a new milestone, a smaller definition of v1, or a replacement for any milestone's completion evidence. The seven milestone definitions, dependencies, functional requirements, and acceptance criteria remain unchanged.
+The approved December 31, 2026 intermediate checkpoint should show one complete journey using selected existing M1–M4 behaviors. It is a development checkpoint, not a new milestone, a smaller definition of v1, or a replacement for any milestone's completion evidence. The seven milestone definitions, dependencies, functional requirements, and acceptance criteria remain unchanged. Prioritize the first working implementation slice toward this checkpoint without waiting for decisions that affect only later slices.
 
 Demonstrate the following sequence through the website using the existing permission rules:
 
-1. Sign in and create a private group (FR-001–FR-002), with a current participant available for selection; use the existing participant-management behavior if needed (FR-003).
-2. Schedule a single, individual movie night with its start date/time (FR-014–FR-015).
-3. As an event editor, assign its picker manually (FR-023).
-4. Record one movie using the approved catalog/manual-entry behavior (FR-009, FR-024).
-5. Explicitly confirm completion with picker credit, then verify the movie and picker credit in group history and the corresponding lifetime picker total (FR-025, FR-027).
+1. Authenticate using the approved requirements (FR-001).
+2. Create a private group (FR-002).
+3. Add participants without accounts (FR-003).
+4. Schedule a single, individual movie night with its start date/time (FR-014–FR-015).
+5. As an event editor, assign its picker manually (FR-023).
+6. Record one movie through catalog search or manual entry under the approved behavior (FR-009, FR-024).
+7. Explicitly confirm completion with picker credit, then verify the movie and picker credit in group history and the corresponding lifetime picker total (FR-025, FR-027).
 
 Checkpoint evidence is a successful end-to-end demonstration of that sequence, with the completed night visible in history and credited once under the existing acceptance criteria. It does not mark M1–M4 complete or change their approved delivery dependencies. Requirements outside this demonstration remain required in their existing milestones; random rotation, lifecycle, migration, and all other v1 requirements are still part of the full release.
 
 The checkpoint can be demonstrated when its necessary behaviors are available under the normal planning approvals and the affected-policy gates in section 11. It does not resolve an open policy, authorize architecture or implementation work, or change the post-MVP recommendation boundary.
+
+Remaining architecture planning is timeboxed to 2–3 focused sessions, at most four hours. Resolve blockers for the first slice, recommend established defaults for minor implementation details, and defer later-slice questions until they affect security, data integrity, or delivery. A sufficiently defined first slice can move to draft implementation specifications while later checkpoint decisions remain open. Unresolved product gates still apply before affected implementation; application code and published implementation tickets require explicit project-owner approval.
 
 ## 10. Post-MVP recommendation direction
 
@@ -774,17 +792,23 @@ Targeted policy reviews at the point of need are sufficient; another comprehensi
 | R-003 Completion, reservation, and correction interactions | Manual assignment may select any current participant; one active automatic round; completed credit determines lifetime totals; corrections can change current eligibility without rewriting history. | Confirmation while the movie is still undecided, repeated far-future manual assignments for one person, assignment replacement, completion without credit after a reservation, post-assignment attendance changes, and correcting completed credit after round advancement need precise rules. | Approve the unresolved product outcomes before implementing the affected completion, reservation, or correction behavior, then verify the relevant M4/M5 cases against the approved criteria. Preserve all existing regular-turn and manual-exception rules. |
 | R-004 Recurrence and local-time exceptions | Group-local recurrence, viewer-local display, single/future changes, past-event preservation. | Nonexistent/ambiguous local times, changing the scheduling time zone, and bulk future edits interacting with existing occurrence exceptions, RSVPs, picker assignments, and movie choices are not specified. | Approve unresolved user-visible policies before implementing the affected recurrence or local-time behavior, then verify the M3/integrated scenarios. Time-zone detection tooling and UI presentation remain implementation choices. |
 | R-005 Movie identity and shared-entry semantics | Catalog search plus manual fallback; one interest vote per participant per movie; owner-reviewed migration matches. | The metadata source is unselected. Ongoing manual-to-catalog matching, duplicate suggestions with multiple contributors, vote retraction, and merges affecting ownership/interest/history are not defined. | Select tooling only in later approved technical planning; obtain approval for unresolved product policies affecting attribution, permissions, or counts before implementing their affected behavior, then verify the M2/M7 cases. Keep catalog search and fallback in scope. |
-| R-006 Delivery and adoption risk | 10 hours per week, flexible timeline, full seven-milestone v1, participants without accounts, pilot using migrated records. | Calendar exceptions and participant/account continuity make this a substantial project. No estimates, fixed pilot duration, or number of nights have been agreed. | Estimate after technical planning, preserve scope unless the project owner approves a change, and evaluate progress using milestone evidence and FR-051 rather than an invented deadline. |
-| R-007 Authentication policies | Google sign-in and email/password registration and login are required in v1; sign-in does not bypass private-group membership approval. | Sign-in method linking, password recovery, verification, and security-related behavior remain unresolved; see the [authentication policy questions](#authentication-policy-questions-r-007). | Obtain project-owner approval for the relevant product behavior and technical/security design before affected implementation. Record approved outcomes as testable criteria and verify applicable policies before M1 acceptance and affected later milestone acceptance. |
+| R-006 Delivery and adoption risk | 10 hours per week; approved December 31, 2026 intermediate checkpoint; full seven-milestone v1 with a flexible timeline, participants without accounts, and pilot using migrated records. | Calendar exceptions and participant/account continuity make this a substantial project. No implementation estimates, fixed pilot duration, or number of nights have been agreed. | Timebox remaining architecture to 2–3 focused sessions, define and estimate the first slice, preserve full v1 scope, and assess December progress against the approved checkpoint. Full v1 acceptance still uses milestone evidence and FR-051. |
+| R-007 Authentication policies — partially resolved, with a platform-policy conflict | Google sign-in and email/password registration and login are required in v1. FR-001.AC4–AC7 approve the matching-email linking scenario; AC8–AC11 approve recovery and invalidation of all application sessions. Supabase Auth is selected under ADR 0006. Sign-in does not bypass private-group membership approval. | Supabase's automatic same-email linking conflicts with AC4–AC7. Remaining recovery security details, unlinking, other linking scenarios, email-verification timing, and other security-related behavior remain unresolved; see the [authentication policy questions](#authentication-policy-questions-r-007). | Resolve the Supabase conflict before implementing or enabling an affected Google/password authentication path, without presuming a requirement change. Obtain approval for the remaining relevant product behavior and technical/security design before affected implementation. Verify the approved linking and recovery criteria and record further approved outcomes as testable criteria before affected milestone acceptance. |
 
 ### Authentication policy questions (R-007)
 
-- **Sign-in method linking:** whether it is available, how methods may be linked or unlinked, required proof of control, matching-email conflicts, and duplicate-account handling. This is separate from FR-006's owner/admin-confirmed account link to a group participant.
-- **Password recovery:** availability, identity checks, recovery flow, and effects on existing sessions. The approved registration/login requirement does not settle recovery scope or behavior.
+**Resolved on 2026-11-09:** [ADR 0004](adr/0004-link-google-to-existing-password-account.md) and FR-001.AC4–AC7 establish the matching-email, existing-password-account-to-Google linking rule, including use of either method afterward and stopping the Google sign-in attempt without another account when existing-account authentication fails. R-007 remains open for the questions below.
+
+**Resolved on 2026-11-10:** [ADR 0005](adr/0005-password-recovery-and-session-invalidation.md) and FR-001.AC8–AC11 establish recovery by code to the account's previously verified email, choosing a new password, and invalidating all existing application sessions, including the current browser. The confirmation flow stays visible and offers normal sign-in; recovery does not automatically sign the person in. R-007 remains partially resolved.
+
+**Platform selected; linking conflict unresolved:** [ADR 0006](adr/0006-select-supabase-auth-and-postgresql.md) records Supabase Auth and Supabase PostgreSQL with React and FastAPI. [Supabase's documented automatic same-email identity linking](https://supabase.com/docs/guides/auth/auth-identity-linking#automatic-linking) conflicts with FR-001.AC4–AC7 and ADR 0004. Resolve that conflict before implementing or enabling an affected Google/password flow, including automatic linking during Google sign-in. Enabling manual linking or hiding a linking button does not by itself resolve the conflict. Any change to the approved policy requires explicit project-owner approval; neither platform selection nor implementation defaults authorize it. An independently scoped email/password-first slice can be specified separately without treating Google sign-in or linking as completed or removing them from v1.
+
+- **Remaining sign-in method linking:** unlinking, Google-first accounts later adding passwords, different-email linking, pre-existing duplicate-account handling, and the technical details of obtaining and validating the required authentication proofs. These remain separate from FR-006's owner/admin-confirmed account link to a group participant.
+- **Remaining password-recovery details:** code expiration, retry and resend controls, delivery-failure handling, loss of access to the verified email, and technical enforcement of the approved flow. The recovery channel, new-password flow, session-invalidation outcome, and confirmation followed by normal sign-in are settled by AC8–AC11. Review established library/service defaults together rather than choosing unapproved values here.
 - **Email ownership:** verification requirements and timing, and the handling of email changes.
 - **Security-related behavior:** password rules, failed-attempt responses, throttling or lockouts, session duration, logout, and sensitive-action reauthentication.
 
-No automatic sign-in method linking, username login, recovery mechanism, security thresholds, authentication provider, or schema is approved by this amendment. Authentication email requirements depend on the decisions above; they are separate from the existing deferral of movie-night and group-activity notifications. Authentication tooling and credential storage design still require technical planning and approval.
+The approved linking decision does not authorize linking from an email match alone. Username login, unlinking, other linking scenarios, remaining security thresholds, application schema, and provider integration details remain unapproved. Supabase Auth and Supabase PostgreSQL are selected; this does not waive their compatibility review against the approved requirements. Recovery-code email delivery is required by AC8; other authentication email requirements depend on the unresolved decisions above. Authentication emails are separate from the existing deferral of movie-night and group-activity notifications. Session enforcement, database exposure controls, and remaining security configuration require the relevant planning and approval.
 
 The following can be refined during implementation within the approved outcomes: wording and form arrangement, sorting/presentation, responsive layout details, and how review evidence is presented. Specific validation limits, new permissions, retention rules, automatic identity matching, or changed business outcomes are not merely presentation details and must not be introduced as already approved.
 
@@ -822,6 +846,9 @@ This matrix records a section-by-section coverage review. A mapped provisional r
 | ADR 0001 | Distinct participation/access and manager-confirmed continuity. | FR-003, FR-006, FR-008, FR-036, FR-046; BR-01–BR-02. |
 | ADR 0002 | Reservation/completion distinction, cancellation release, independent eligibility, and one active round. | FR-025, FR-027, FR-032–FR-035, FR-038, FR-049; BR-05–BR-07. |
 | ADR 0003 | Approved Google and email/password authentication scope; superseded discovery history; distinction between sign-in method linking and participant account links; unresolved authentication policies. | FR-001, FR-006; sections 1, 3, 7, 9, and 11; R-007. |
+| ADR 0004 | Matching-email password-account-to-Google linking requires authentication to both; either method works afterward; failure to authenticate the existing account stops the attempt without creating another account. Remaining policies stay open. | FR-001.AC4–AC7; FR-006 distinction; sections 1, 7, 8, and 11; R-007. |
+| ADR 0005 | Password recovery by code to a previously verified email; choose a new password; invalidate every existing application session, including the current browser; preserve confirmation and require normal sign-in. | FR-001.AC8–AC11; sections 1, 3, and 11; R-007. |
+| ADR 0006 | Selected React/FastAPI/Supabase Auth/Supabase PostgreSQL foundations; unresolved automatic-linking conflict; full product scope and affected implementation gates preserved. | Sections 1, 9, and 11; FR-001 unchanged; R-007. |
 | Glossary | Participant/member distinction; event editor; scheduling zone; RSVP/actual attendance; rotation/reservation/credit/total; shared watchlist/interest/history. | Used throughout sections 2–12 and the permission/business-rule tables. |
 
 **Coverage result:** All 16 discovery decision areas and all seven milestone outcomes are represented. No approved requirement is intentionally omitted or moved to post-MVP. The unresolved policy/feasibility items are explicitly listed in section 11 and are not reported as already settled.
